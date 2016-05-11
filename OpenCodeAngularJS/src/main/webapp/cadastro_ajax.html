@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>OpenCode Download</title>
+
+    <meta name="description" content="Source code generated using layoutit.com">
+    <meta name="author" content="LayoutIt!">
+	<script type="application/javascript" src="js/jquery-2.2.1.js"></script>
+	<script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/angular.js"></script>
+	<script type="application/javascript">
+
+	function Book (){
+		this.id = '',
+		this.linguagem = '',
+		this.titulo = ''
+	};
+	
+	var app = angular.module("divListagem",[]);
+	
+	app.controller("listagem", function($scope, $http, $timeout){
+		
+		$scope.livros = [];
+		$scope.editar = true;
+		
+		/*	FUNCAO PARA ALIMENTAR A LISTA NO INICIO	*/
+			$http.get("http://localhost:8080/OpenCodeAngularJS/ServletSave")
+				.success(function(result){
+				$scope.livros = result;
+				});
+		/*----------------------------------------------*/
+		
+		$scope.atualizar = function(){
+			/*	FUNCAO PARA ATUALIZAR A LISTA NO INICIO	*/
+			$http.get("http://localhost:8080/OpenCodeAngularJS/ServletSave")
+				.success(function(result){
+				$scope.livros = result;
+				});
+			/*----------------------------------------------*/
+		}
+		
+		/*	METODO PARA DELETAR UM ELEMENTO DA LISTA	*/
+		$scope.deletar = function(livro){
+			var index = $scope.livros.indexOf(livro);
+			$scope.livros.splice(index,1);
+			$http({
+		     	url : 'http://localhost:8080/OpenCodeAngularJS/ServletDelete',
+		        method : "POST",
+		        data : {
+		        	'id': livro.id
+		        }
+		        }).then(function(response) {
+		        	//DO NOTHING
+		        }, function(response) {
+		            //FAIL CASE - DO NOTHING
+		        });
+			
+		}
+		/*---------------------------------------------------*/
+		
+		/*	FUNCAO PARA CADASTRAR UM NOVO LIVRO COM INSERCAO NA LISTA	*/
+		$scope.cadastrar = function(){
+			
+			/*	METODO POST PARA SALVAR O NOVO LIVRO	*/
+			 $http({
+		     	url : 'http://localhost:8080/OpenCodeAngularJS/ServletSave',
+		        method : "POST",
+		        data : {
+		        	'ling' : $scope.txtLing,
+		        	'titulo': $scope.txtTit
+		        }
+		        }).then(function(response) {
+		        	$scope.livros.push(response.data);
+		        	$scope.txtLing = '';
+		        	$scope.txtTit = '';
+		        }, function(response) {
+		            //FAIL CASE
+		        });
+		}
+		/*-----------------------------------------------------------------*/
+		
+		$scope.showEditar = function(id){
+			console.log(id);
+			if ($('#'+id+'').is(':visible')){
+				console.log('ENTREI 1');
+				$('#'+id+'').hide(1000);
+			}else{
+				console.log('ENTREI 2');
+				$('#'+id+'').show(1000);
+			}
+		}
+		
+		$scope.editar = function(l){
+			var linguagemNova = angular.element(document).find( '#txtLingEdit'+l.id+'' ).val();
+			var tituloNovo = angular.element(document).find( '#txtTitEdit'+l.id+'' ).val();
+			$http({
+		     	url : 'http://localhost:8080/OpenCodeAngularJS/ServletEditar',
+		        method : "POST",
+		        data : {
+		        	'id': l.id,
+		        	'linguagem': linguagemNova,
+					'titulo': tituloNovo
+		        }
+		        }).then(function() {
+		        	$scope.atualizar();
+		        }, function(response) {
+		            //FAIL CASE - DO NOTHING
+		        });
+		}
+		
+	});
+	
+
+  </script>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+
+  </head>
+  <body data-ng-app="divListagem">
+    <div class="container-fluid">
+	<div class="row">
+		<div class="span12">
+			<nav class="navbar navbar-default navbar-inverse navbar-static-top" role="navigation">
+				<div class="navbar-header"> 
+					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+						 <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+					</button> <a class="navbar-brand" href="#">Home</a>
+				</div>
+				
+				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+					<form class="navbar-form navbar-right" role="search">
+						<button type="submit" class="btn btn-default">
+							Pesquisar
+						</button>
+						<div class="form-group">
+							<input type="text" class="form-control" />&nbsp;&nbsp;
+						</div>
+					</form>
+				</div>	
+			</nav>
+			<h1 align="center">
+				 Open Code! <small>Um café e conhecimento não se nega a ninguém</small> <span class="glyphicon glyphicon-education" />	
+			</h1>	
+		</div>
+		<hr width="97%" align="center" noshade style="border:solid 3px black; border-radius: 10px;">
+	</div>
+	<div class="row" data-ng-controller="listagem">
+		<div class="col-md-8">
+		<br>
+			<div class="tabbable" id="tabs-19829">
+				<ul class="nav nav-tabs">
+					<li class="active">
+						<a href="#panel-235775" data-toggle="tab">Cadastro</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="panel-235775" >
+						<br><br>
+						<form data-ng-submit="cadastrar()" name="formCadastro" class="form-horizontal" novalidate>
+							<div class="form-group" id="linguagem-group">
+								<div class="col-sm-5">
+									<label>
+										Linguagem:
+									</label>
+									<div id="divLinguagem">
+										<span name="msgLinguagem" class="help-block" data-ng-show="formCadastro.txtLinguagem.$error.required">Preencha o campo</span>
+										<input type="text" class="form-control col-lg-4" name="txtLinguagem" data-ng-model="txtLing" required/> 
+									</div>
+								</div>
+							</div>
+							<div class="form-group" id="titulo-group">
+								<div class="col-sm-5">
+									<label>
+										Título do documento:
+									</label>
+									<div id="divTitulo">
+										<span id="msgTitulo" class="help-block" data-ng-show="formCadastro.txtTitulo.$error.required">Preencha o campo</span>
+										<input type="text" class="form-control col-lg-4 has-error" name="txtTitulo" data-ng-model="txtTit" required/>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-5">
+									<button type="submit" class="btn btn-primary" data-ng-disabled="formCadastro.$invalid">
+										Cadastrar
+									</button>
+									<img id="carregando" src="img/general-loader.gif" style="width:50px;heigth:50px;
+										display:none;"></img>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+		<div class="col-md-4">
+			<div>
+				<ul>
+					<li data-ng-repeat="l in livros">
+						<p editable-text="">{{l.id}} - {{l.linguagem}} - {{l.titulo}}</p>
+						<button data-ng-click="deletar(l)" class="btn btn-danger">
+				     	<i class="glyphicon glyphicon-trash"></i></button>
+				     	<button data-ng-click="showEditar(l.id)" class="btn btn-danger">
+				     	<i class="glyphicon glyphicon-pencil"></i></button>
+				     	<div id="{{l.id}}" style="display:none;">
+				     		<form data-ng-submit="editar(l)" name="formEditar" class="form-horizontal" novalidate>
+				     			Linguagem: <br><input type="text" class="form-control col-lg-4" id="txtLingEdit{{l.id}}"  data-ng-model="txtLingEdit" required/>
+				     			<br>Titulo: <br><input type="text" class="form-control col-lg-4" id="txtTitEdit{{l.id}}" data-ng-model="txtTitEdit" required/>
+				     			<br><button class="btn btn-success" data-ng-disabled="formEditar.$invalid">Confirmar
+				     			<i class="glyphicon glyphicon-ok"></i></button>
+				     		</form>
+				     	</div>
+					</li>				
+				</ul>
+			</div>			
+		</div>
+	</div>
+	<div class="row" id="rodape">
+		<div class="col-md-12">
+		<hr size="10" width="80%" align="center" noshade>
+			<div class="text-center">
+				<address>
+					<strong>Juan vinicius</strong><br> OpenCode Desenvolvimento @Copyright
+				</address>
+			</div>
+		</div>
+	</div>
+</div>
+  </body>
+</html>
